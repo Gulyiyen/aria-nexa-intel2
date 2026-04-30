@@ -1,0 +1,7 @@
+{
+  "name": "aria-nexa-intelligence",
+  "version": "3.0.0",
+  "description": "Aria Nexa Intelligence - Secure Backend",
+  "type": "module",
+  "private": true
+}
