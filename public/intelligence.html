@@ -501,8 +501,8 @@ function renderReports() {
   const container = document.getElementById('reportsContainer');
   document.getElementById('reportsCount').textContent = reports.length + ' Report' + (reports.length !== 1 ? 's' : '');
   
-  container.innerHTML = reports.map(r => 
-    '<div class="report-card" onclick="viewReport('' + r.title.replace(/'/g, "\'") + '')">' +
+  container.innerHTML = reports.map((r, idx) => 
+    '<div class="report-card" onclick="viewReport(' + idx + ')">' +
       '<div class="rc-top">' +
         '<div class="rc-type ' + r.type + '">' + r.type + '</div>' +
       '</div>' +
@@ -511,7 +511,7 @@ function renderReports() {
       '<div class="rc-tags">' + r.tags.map(t => '<div class="rc-tag">' + t + '</div>').join('') + '</div>' +
       '<div class="rc-meta">' +
         '<div class="rc-time">' + r.time + '</div>' +
-        '<a href="#" class="rc-copy" onclick="event.stopPropagation();copyReport('' + r.title.replace(/'/g, "\'") + '');return false;">Copy</a>' +
+        '<a href="#" class="rc-copy" onclick="event.stopPropagation();copyReport(' + idx + ');return false;">Copy</a>' +
       '</div>' +
     '</div>'
   ).join('');
@@ -552,61 +552,46 @@ async function callClaude(systemPrompt, userMessage) {
 
 function getDemoResponse(agent, mission) {
   const demos = {
-    market: 'MARKET INTELLIGENCE REPORT
-
-Sector: Luxury Real Estate Marketing
-Geography: UK Market
-
-KEY FINDINGS:
-1. High-end estate agents struggle with HNWI communication
-2. Tax transparency is a major trust barrier
-3. Social media consistency is the #1 pain point
-
-GAPS IDENTIFIED:
-- No SDLT communication frameworks for luxury agents
-- Instagram calendars exist but none target luxury property niche',
+    market: 'MARKET INTELLIGENCE REPORT\n\n' +
+      'Sector: Luxury Real Estate Marketing\n' +
+      'Geography: UK Market\n\n' +
+      'KEY FINDINGS:\n' +
+      '1. High-end estate agents struggle with HNWI communication\n' +
+      '2. Tax transparency is a major trust barrier\n' +
+      '3. Social media consistency is the #1 pain point\n\n' +
+      'GAPS IDENTIFIED:\n' +
+      '- No SDLT communication frameworks for luxury agents\n' +
+      '- Instagram calendars exist but none target luxury property niche',
     
-    instagram: 'INSTAGRAM INTELLIGENCE SCAN
-
-Hashtags Analyzed: #luxuryrealestate
-
-TOP PAIN POINTS:
-1. "How do I explain stamp duty?" - 34 mentions
-2. "Need content that does not look generic" - 28 mentions
-
-OPPORTUNITY: Educational tax content + ready-to-use social templates',
+    instagram: 'INSTAGRAM INTELLIGENCE SCAN\n\n' +
+      'Hashtags Analyzed: #luxuryrealestate\n\n' +
+      'TOP PAIN POINTS:\n' +
+      '1. "How do I explain stamp duty?" - 34 mentions\n' +
+      '2. "Need content that does not look generic" - 28 mentions\n\n' +
+      'OPPORTUNITY: Educational tax content + ready-to-use social templates',
     
-    reddit: 'REDDIT PAIN POINT ANALYSIS
-
-Subreddits: r/realestate
-
-RECURRING QUESTIONS:
-1. "Best way to communicate with HNW clients?" - 12 threads
-2. "How to differentiate in saturated luxury market?" - 9 threads
-
-VALIDATED NEED: Luxury-specific communication frameworks',
+    reddit: 'REDDIT PAIN POINT ANALYSIS\n\n' +
+      'Subreddits: r/realestate\n\n' +
+      'RECURRING QUESTIONS:\n' +
+      '1. "Best way to communicate with HNW clients?" - 12 threads\n' +
+      '2. "How to differentiate in saturated luxury market?" - 9 threads\n\n' +
+      'VALIDATED NEED: Luxury-specific communication frameworks',
     
-    etsy: 'ETSY COMPETITOR INTELLIGENCE
-
-Niche: Real Estate Templates
-
-PRICING LANDSCAPE:
-- Generic templates: £3-8
-- Social media templates: £10-18
-
-GAPS:
-1. NO luxury-specific property marketing tools
-2. NO SDLT/tax communication frameworks
-
-OPPORTUNITY: Premium positioning at £25-45',
+    etsy: 'ETSY COMPETITOR INTELLIGENCE\n\n' +
+      'Niche: Real Estate Templates\n\n' +
+      'PRICING LANDSCAPE:\n' +
+      '- Generic templates: £3-8\n' +
+      '- Social media templates: £10-18\n\n' +
+      'GAPS:\n' +
+      '1. NO luxury-specific property marketing tools\n' +
+      '2. NO SDLT/tax communication frameworks\n\n' +
+      'OPPORTUNITY: Premium positioning at £25-45',
     
-    linkedin: 'LINKEDIN PROFESSIONAL INTELLIGENCE
-
-SKILLS IN DEMAND:
-- "Luxury client communication" - 34 job posts
-- "Premium brand positioning" - 28 mentions
-
-INSIGHT: Professional development around soft skills is highly valued'
+    linkedin: 'LINKEDIN PROFESSIONAL INTELLIGENCE\n\n' +
+      'SKILLS IN DEMAND:\n' +
+      '- "Luxury client communication" - 34 job posts\n' +
+      '- "Premium brand positioning" - 28 mentions\n\n' +
+      'INSIGHT: Professional development around soft skills is highly valued'
   };
   
   return demos[agent] || 'Intelligence gathered successfully.';
@@ -694,27 +679,8 @@ async function runIntelligence() {
   await sleep(1500);
 
   const gapPrompt = 'Strategic gap analyst. Identify top 3 product gaps, rank by opportunity, suggest pricing, recommend which to pursue first.';
-  const allIntel = 'MARKET:
-' + marketResponse + '
-
-INSTAGRAM:
-' + instagramResponse + '
-
-REDDIT:
-' + redditResponse + '
-
-ETSY:
-' + etsyResponse + '
-
-LINKEDIN:
-' + linkedinResponse;
-  const gapAnalysis = await callClaude(gapPrompt, 'Analyze and identify gaps:
-
-' + allIntel) || 'GAP ANALYSIS:
-
-1. SDLT Communication Pack - High demand, zero supply, £35-45
-2. Instagram Content Calendar - Recurring pain, £12-18
-3. HNWI Communication Kit - Professional development need, £25-35';
+  const allIntel = 'MARKET:\n' + marketResponse + '\n\nINSTAGRAM:\n' + instagramResponse + '\n\nREDDIT:\n' + redditResponse + '\n\nETSY:\n' + etsyResponse + '\n\nLINKEDIN:\n' + linkedinResponse;
+  const gapAnalysis = await callClaude(gapPrompt, 'Analyze and identify gaps:\n\n' + allIntel) || 'GAP ANALYSIS:\n\n1. SDLT Communication Pack - High demand, zero supply, £35-45\n2. Instagram Content Calendar - Recurring pain, £12-18\n3. HNWI Communication Kit - Professional development need, £25-35';
   
   addLog('super', 'Gap analysis complete', true);
   setStepStatus(3, 'done');
@@ -732,12 +698,7 @@ LINKEDIN:
   await sleep(1600);
 
   const productPrompt = 'Product design agent. Create sellable product: name, price, deliverables, target customer, benefits, positioning.';
-  const productSpec = await callClaude(productPrompt, 'Design product for this gap:
-
-' + gapAnalysis) || 'PRODUCT: SDLT Transparency Pack
-Price: £39
-Includes: 20 templates, AI prompts, threshold cards
-Target: UK estate agents (£1M+ properties)';
+  const productSpec = await callClaude(productPrompt, 'Design product for this gap:\n\n' + gapAnalysis) || 'PRODUCT: SDLT Transparency Pack\nPrice: £39\nIncludes: 20 templates, AI prompts, threshold cards\nTarget: UK estate agents (£1M+ properties)';
   
   addLog('product', 'Product designed', true);
   setStepStatus(4, 'done');
@@ -754,11 +715,7 @@ Target: UK estate agents (£1M+ properties)';
   await sleep(1400);
 
   const etsyPrompt = 'Etsy listing optimizer. Create: SEO title, description, 13 tags, what is included, image suggestions.';
-  const etsyListing = await callClaude(etsyPrompt, 'Create Etsy listing for:
-
-' + productSpec) || 'ETSY LISTING:
-Title: SDLT Communication Pack | Luxury Estate Agent Templates...
-Tags: sdlt, estate agent, luxury property...';
+  const etsyListing = await callClaude(etsyPrompt, 'Create Etsy listing for:\n\n' + productSpec) || 'ETSY LISTING:\nTitle: SDLT Communication Pack | Luxury Estate Agent Templates...\nTags: sdlt, estate agent, luxury property...';
   
   addLog('super', 'Etsy listing ready', true);
   setStepStatus(5, 'done');
@@ -793,23 +750,17 @@ function clearLog() {
   renderLog();
 }
 
-function viewReport(title) {
-  const report = reports.find(r => r.title === title);
+function viewReport(idx) {
+  const report = reports[idx];
   if (report) {
-    alert(report.type.toUpperCase() + '
-
-' + report.title + '
-
-' + report.fullBody);
+    alert(report.type.toUpperCase() + '\n\n' + report.title + '\n\n' + report.fullBody);
   }
 }
 
-function copyReport(title) {
-  const report = reports.find(r => r.title === title);
+function copyReport(idx) {
+  const report = reports[idx];
   if (report) {
-    navigator.clipboard.writeText(report.type.toUpperCase() + ': ' + report.title + '
-
-' + report.fullBody)
+    navigator.clipboard.writeText(report.type.toUpperCase() + ': ' + report.title + '\n\n' + report.fullBody)
       .then(() => alert('Report copied!'));
   }
 }
@@ -821,27 +772,14 @@ function exportReports() {
   }
   
   const text = reports.map(r => 
-    '═══════════════════════════════════════
-' +
-    r.type.toUpperCase() + ' REPORT
-' +
-    '═══════════════════════════════════════
-
-' +
-    r.title + '
-' +
-    r.time + '
-
-' +
-    r.fullBody + '
-
-' +
-    'Tags: ' + r.tags.join(', ') + '
-'
-  ).join('
-─────────────────────────────────────────
-
-');
+    '═══════════════════════════════════════\n' +
+    r.type.toUpperCase() + ' REPORT\n' +
+    '═══════════════════════════════════════\n\n' +
+    r.title + '\n' +
+    r.time + '\n\n' +
+    r.fullBody + '\n\n' +
+    'Tags: ' + r.tags.join(', ') + '\n'
+  ).join('\n─────────────────────────────────────────\n\n');
   
   const blob = new Blob([text], {type: 'text/plain'});
   const a = document.createElement('a');
