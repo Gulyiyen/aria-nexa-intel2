@@ -35,7 +35,7 @@ export default async function handler(req, res) {
 
     // Build request
     const body = {
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 4096,
       messages: [{ role: 'user', content: userMessage }]
     };
@@ -45,7 +45,10 @@ export default async function handler(req, res) {
     }
 
     if (useWebSearch) {
-      body.tools = [{ type: "web_search_20250305", name: "web_search" }];
+      body.tools = [{ 
+        type: "web_search_20250305", 
+        name: "web_search" 
+      }];
     }
 
     // Call Anthropic
